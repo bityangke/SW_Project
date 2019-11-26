@@ -18,20 +18,13 @@ class APMeter(object):
 
     def __init__(self):
         super(APMeter, self).__init__()
-        self.scores = None
-        self.targets = None
-        self.weights = None
         self.reset()
 
     def reset(self):
         """Resets the meter with empty member variables"""
-        # torch.FloatStorage()
-        self.scores = torch.FloatTensor()
-        self.targets = torch.LongTensor()
-        self.weights = torch.FloatTensor()
-        # self.scores = torch.FloatTensor(torch.FloatStorage())
-        # self.targets = torch.LongTensor(torch.LongStorage())
-        # self.weights = torch.FloatTensor(torch.FloatStorage())
+        self.scores = torch.FloatTensor(torch.FloatStorage())
+        self.targets = torch.LongTensor(torch.LongStorage())
+        self.weights = torch.FloatTensor(torch.FloatStorage())
 
     def add(self, output, target, weight=None):
         """Add a new observation
@@ -138,5 +131,5 @@ class APMeter(object):
             precision = tp.div(rg)
 
             # compute average precision
-            ap[k] = precision[truth].sum() / max(float(truth.sum()), 1)
+            ap[k] = precision[truth.byte()].sum() / max(float(truth.sum()), 1)
         return ap

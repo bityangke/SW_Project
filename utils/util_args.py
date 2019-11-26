@@ -61,7 +61,7 @@ def get_args():
 
     # path
     parser.add_argument('--dataset', type=str, default='PASCAL', )
-    parser.add_argument('--train-list', type=str, default='./datalist/PascalVOC/train_aug.txt')
+    parser.add_argument('--train-list', type=str, default='./datalist/PascalVOC/input_list.txt')
     parser.add_argument('--val-list', type=str, default='./datalist/PascalVOC/val.txt')
     parser.add_argument('--test-list', type=str, default='./datalist/PascalVOC/test.txt')
     parser.add_argument('--size-list', type=str, default='./datalist/PascalVOC/sizes.txt')

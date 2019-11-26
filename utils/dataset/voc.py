@@ -38,8 +38,10 @@ class VOCDataset(Dataset):
 
         image_path = os.path.join(self.root, IMG_FOLDER_NAME, name + '.jpg')
         img = PIL.Image.open(image_path).convert("RGB")
+        # print(idx)
         if self.mode is not 'test':
-            label = torch.from_numpy(self.label_list[idx])
+            # label = torch.from_numpy(self.label_list[idx])
+            label = torch.from_numpy(self.label_list[name])
         else:
             label = None
         if self.transform:
@@ -53,7 +55,8 @@ class VOCDataset(Dataset):
 
 def load_image_label_list_from_npy(img_name_list):
     cls_labels_dict = np.load('datalist/PascalVOC/cls_labels.npy', allow_pickle=True).item()
-    return [cls_labels_dict[img_name] for img_name in img_name_list]
+    return {img_name: cls_labels_dict[img_name] for img_name in img_name_list}
+    # return [cls_labels_dict[img_name] for img_name in img_name_list]
 
 
 def load_img_cue_name_list(dataset_path):

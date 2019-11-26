@@ -6,6 +6,7 @@ import numpy as np
 
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import torch.optim
 import torch.utils.data
 import architecture as models
@@ -45,8 +46,8 @@ def main():
         model = model.cuda(args.gpu)
 
     # define loss function (criterion) and optimizer
-    # criterion = nn.MultiLabelSoftMarginLoss().cuda(args.gpu)
-    criterion = nn.BCEWithLogitsLoss().cuda(args.gpu)
+    criterion = nn.MultiLabelSoftMarginLoss().cuda(args.gpu)
+    # criterion = nn.BCEWithLogitsLoss().cuda(args.gpu)
 
     # Take apart parameters to give different Learning Rate
     param_features = []
@@ -125,7 +126,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
     # switch to train mode
     model.train()
-    for i, (images, target) in enumerate(tqdm(train_loader, desc='Train')):
+    train_t = tqdm(train_loader)
+    for i, (images, target) in enumerate(train_t):
         images = images.cuda(args.gpu, non_blocking=True)
         target = target.cuda(args.gpu, non_blocking=True)
 
@@ -133,13 +135,15 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         loss = criterion(output, target)
 
         # measure accuracy and record loss
-        ap.add(output.detach(), target)
+        ap.add(output.data, target.data)
         losses.update(loss.item(), images.size(0))
-
         optimizer.zero_grad()
-
         loss.backward()
         optimizer.step()
+        # print(ap.value())
+        description = "[T:{0:3d}/{1:3d}] Loss: {2:.3f}, AP: {3:.3f}".\
+            format(epoch, args.epochs, losses.avg, torch.mean(ap.value()))
+        train_t.set_description(desc=description)
 
     return ap.value(), losses.avg
 
@@ -151,7 +155,8 @@ def validate(val_loader, model, criterion, epoch, args):
     # switch to evaluate mode
     model.eval()
     with torch.no_grad():
-        for i, (images, target, image_id) in enumerate(val_loader):
+        val_t = tqdm(val_loader)
+        for i, (images, target, image_id) in enumerate(val_t):
             images = images.cuda(args.gpu, non_blocking=True)
             target = target.cuda(args.gpu, non_blocking=True)
 
@@ -160,8 +165,13 @@ def validate(val_loader, model, criterion, epoch, args):
             loss = criterion(output, target)
 
             # measure accuracy and record loss
-            ap.add(output.detach(), target)
+            ap.add(torch.sigmoid(output), target)
             losses.update(loss.item(), images.size(0))
+
+            description = "[V:{0:3d}/{1:3d}] Loss: {2:3f}, AP: {3:.3f}".\
+                format(epoch, args.epochs, losses.avg, torch.mean(ap.value()))
+            val_t.set_description(description)
+
     return ap.value(), losses.avg
 
 
