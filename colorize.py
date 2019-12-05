@@ -20,7 +20,6 @@ def convert_color(image_path):
     new_image = np.zeros((image.shape[0], image.shape[1], 3))
     for i in range(20):
         new_image[np.where(image == i)] = LABEL_COLOR[i]
-    # cv2.imwrite(save_path, new_image[:, :, ::-1])
     return new_image[:, :, ::-1]
 
 
