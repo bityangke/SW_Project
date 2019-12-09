@@ -7,6 +7,7 @@ batch=32
 # You must change
 data_root="/srv/PascalVOC/VOCdevkit/VOC2012/"
 test_list="datalist/PascalVOC/test.txt"
+resume='train_log/test/model_best_cls.pth.tar'
 
 CUDA_VISIBLE_DEVICES=${gpu} python test.py \
     --arch ${arch} \
@@ -14,4 +15,5 @@ CUDA_VISIBLE_DEVICES=${gpu} python test.py \
     --data ${data_root} \
     --batch-size ${batch} \
     --test-list ${test_list} \
+    --resume ${resume} \
 
